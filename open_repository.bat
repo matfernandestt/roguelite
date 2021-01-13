@@ -1,0 +1,1 @@
+TortoiseGitProc /command:log
