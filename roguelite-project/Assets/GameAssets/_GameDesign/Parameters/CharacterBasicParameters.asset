@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: CharacterBasicParameters
   m_EditorClassIdentifier: 
   walkSpeed: 5
-  jumpForce: 300
+  runSpeed: 8
+  jumpForce: 500

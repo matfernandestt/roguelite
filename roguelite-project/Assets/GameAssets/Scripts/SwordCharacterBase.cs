@@ -1,13 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 
 public class SwordCharacterBase : CharacterInputBase
 {
     [Header("References")]
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private CharacterCollisionBase charCol;
 
     
     [Header("Parameters")]
     [SerializeField] private CharacterBasicParameters parameters;
+
+    private float characterMovementSpeed;
     
     protected override void Awake()
     {
@@ -15,12 +20,29 @@ public class SwordCharacterBase : CharacterInputBase
 
         horizontalInputEvent += HorizontalInput;
         verticalInputEvent += VerticalInput;
+        
         jumpInputEvent += JumpInput;
+        runBeginInputEvent += RunBeginInput;
+        runEndInputEvent += RunEndInput;
+        dropDownInputEvent += DropDownInput;
+
+        characterMovementSpeed = parameters.walkSpeed;
+    }
+
+    private void OnDestroy()
+    {
+        horizontalInputEvent -= HorizontalInput;
+        verticalInputEvent -= VerticalInput;
+        
+        jumpInputEvent -= JumpInput;
+        runBeginInputEvent -= RunBeginInput;
+        runEndInputEvent -= RunEndInput;
+        dropDownInputEvent -= DropDownInput;
     }
 
     private void HorizontalInput(float axis)
     {
-        rb.velocity = new Vector2(axis * parameters.walkSpeed, rb.velocity.y);
+        rb.velocity = new Vector2(axis * characterMovementSpeed, rb.velocity.y);
         FlipCharacter(axis);
     }
 
@@ -34,6 +56,31 @@ public class SwordCharacterBase : CharacterInputBase
         rb.velocity = new Vector2(rb.velocity.x, 0);
         
         rb.AddForce(Vector2.up * parameters.jumpForce);
+    }
+
+    private void RunBeginInput()
+    {
+        characterMovementSpeed = parameters.runSpeed;
+    }
+
+    private void DropDownInput()
+    {
+        if (charCol.overPlatform)
+        {
+            charCol.platformConnected.OneWayDown();
+            StartCoroutine(ReenablePlatform());
+        }
+
+        IEnumerator ReenablePlatform()
+        {
+            yield return new WaitForSeconds(.5f);
+            charCol.platformConnected.OneWayUp();
+        }
+    }
+
+    private void RunEndInput()
+    {
+        characterMovementSpeed = parameters.walkSpeed;
     }
 
     #region ETC

@@ -4,5 +4,6 @@
 public class CharacterBasicParameters : ScriptableObject
 {
     public float walkSpeed;
+    public float runSpeed;
     public float jumpForce;
 }
