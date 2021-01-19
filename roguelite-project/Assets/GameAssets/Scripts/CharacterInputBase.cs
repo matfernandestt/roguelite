@@ -18,6 +18,11 @@ public class CharacterInputBase : MonoBehaviour
     protected Action runEndInputEvent;
     protected Action dropDownInputEvent;
 
+    protected bool isGrounded;
+
+    [SerializeField] private BoxCollider2D mainCollider;
+    [SerializeField] private LayerMask groundMask;
+
     protected virtual void Awake()
     {
         input = ReInput.players.GetPlayer(0);
@@ -39,7 +44,15 @@ public class CharacterInputBase : MonoBehaviour
 
     private void JumpEvent()
     {
-        if(input.GetButtonDown(JumpAction) && input.GetAxis(VerticalAction) >= 0)
+        var hit1 = Physics2D.Raycast(mainCollider.bounds.center + new Vector3(mainCollider.bounds.extents.x, 0), Vector2.down, mainCollider.bounds.extents.y + .1f, groundMask);
+        var hit2 = Physics2D.Raycast(mainCollider.bounds.center - new Vector3(mainCollider.bounds.extents.x, 0), Vector2.down, mainCollider.bounds.extents.y + .1f, groundMask);
+        var c1 = hit1.collider != null ? Color.green : Color.red;
+        var c2 = hit2.collider != null ? Color.green : Color.red;
+        Debug.DrawRay(mainCollider.bounds.center + new Vector3(mainCollider.bounds.extents.x, 0), Vector2.down * (mainCollider.bounds.extents.y + .1f), c1);
+        Debug.DrawRay(mainCollider.bounds.center - new Vector3(mainCollider.bounds.extents.x, 0), Vector2.down * (mainCollider.bounds.extents.y + .1f), c2);
+        isGrounded = hit1.collider != null || hit2.collider != null;
+        
+        if(input.GetButtonDown(JumpAction) && input.GetAxis(VerticalAction) >= 0 && isGrounded)
             jumpInputEvent?.Invoke();
     }
 

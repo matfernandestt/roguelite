@@ -73,7 +73,7 @@ public class SwordCharacterBase : CharacterInputBase
 
         IEnumerator ReenablePlatform()
         {
-            yield return new WaitForSeconds(.5f);
+            yield return new WaitForSeconds(.4f);
             charCol.platformConnected.OneWayUp();
         }
     }
